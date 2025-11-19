@@ -1,0 +1,94 @@
+<nav class="navbar navbar-expand-lg main-nav shadow-sm sticky-top">
+  <div class="container">
+
+    <!-- LEFT AREA (Logo + Delivery) -->
+    <a href="/" class="navbar-brand d-flex align-items-center">
+      <img src="https://cdn-icons-png.flaticon.com/512/891/891462.png" width="42" class="me-2">
+      <span class="brand-name">StyleStore</span>
+    </a>
+
+    <!-- MOBILE MENU -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <i class="bi bi-list text-white fs-1"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+
+      <!-- SEARCH BAR -->
+      <form class="search-box d-flex mx-auto" action="/products/search">
+        <input type="text" name="q" class="form-control search-input" placeholder="Search for products, brands and more…">
+        <button class="btn search-btn"><i class="bi bi-search"></i></button>
+      </form>
+
+      <!-- RIGHT MENU -->
+      <ul class="navbar-nav ms-auto align-items-center">
+
+        <!-- Wishlist -->
+        <li class="nav-item mx-2">
+          <a href="/wishlist" class="nav-link nav-icon">
+            <i class="bi bi-heart"></i>
+            <span>Wishlist</span>
+          </a>
+        </li>
+
+        <!-- Cart -->
+        <li class="nav-item mx-2 position-relative">
+          <a href="/cart" class="nav-link nav-icon">
+            <i class="bi bi-cart3"></i>
+            <span>Cart</span>
+
+            <% if (locals.cartCount && cartCount > 0) { %>
+              <span class="badge-count"><%= cartCount %></span>
+            <% } %>
+          </a>
+        </li>
+
+        <!-- USER MENU -->
+        <% if (!session || !session.userId) { %>
+          <li class="nav-item mx-2">
+            <a href="/login" class="nav-link nav-icon">
+              <i class="bi bi-person-circle"></i><span>Login</span>
+            </a>
+          </li>
+          <li class="nav-item mx-2">
+            <a href="/signup" class="nav-link nav-icon">
+              <i class="bi bi-person-plus"></i><span>Signup</span>
+            </a>
+          </li>
+        <% } else { %>
+
+        <li class="nav-item dropdown mx-2">
+          <a class="nav-link nav-icon dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle"></i><span>Account</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Profile</a></li>
+            <li><a class="dropdown-item" href="/orders"><i class="bi bi-box-seam"></i> My Orders</a></li>
+            <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+
+            <% if (session.role === "admin") { %>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-primary fw-bold" href="/admin/dashboard">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+            <% } %>
+          </ul>
+        </li>
+
+        <% } %>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+<!-- SUB NAV CATEGORY BAR (Myntra Style) -->
+<div class="sub-nav shadow-sm">
+  <div class="container d-flex justify-content-center sub-cats">
+
+    <a href="/products?cat=Men">Men</a>
+    <a href="/products?cat=Women">Women</a>
+    <a href="/products?cat=Kids">Kids</a>
+    <a href="/products?cat=Beauty">Beauty</a>
+    <a href="/products?cat=Footwear">Footwear</a>
+  </div>
+</div>

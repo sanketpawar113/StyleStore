@@ -1,0 +1,13 @@
+.card {
+  border-radius: 12px;
+}
+
+.form-control,
+.form-select {
+  border-radius: 10px;
+}
+
+button.btn {
+  border-radius: 10px;
+  font-size: 1rem;
+}

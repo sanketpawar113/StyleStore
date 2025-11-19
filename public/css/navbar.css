@@ -1,0 +1,75 @@
+/* MAIN NAVBAR */
+.main-nav {
+  background: #c5f4ff; /* Amazon Dark */
+  padding: 8px 0;
+}
+
+.brand-name {
+  color: white;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* SEARCH BAR */
+.search-box {
+  width: 55%;
+}
+
+.search-input {
+  border-radius: 8px 0 0 8px;
+  padding-left: 12px;
+}
+
+.search-btn {
+  background: #febd69; /* Amazon Yellow */
+  border-radius: 0 8px 8px 0;
+  font-weight: bold;
+}
+
+/* RIGHT MENU ICONS */
+.nav-icon {
+  color: white;
+  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-icon i {
+  font-size: 1.4rem;
+}
+
+.nav-icon span {
+  font-size: 0.75rem;
+}
+
+/* CART BADGE */
+.badge-count {
+  position: absolute;
+  top: 2px;
+  right: -3px;
+  background: #ff3e4e;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+/* SUB NAVBAR (Myntra Style) */
+.sub-nav {
+  background: #ffffff;
+  padding: 10px 0;
+}
+
+.sub-cats a {
+  margin: 0 18px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.sub-cats a:hover {
+  color: #ff3e6c; /* Myntra Pink */
+}

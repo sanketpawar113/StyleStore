@@ -1,0 +1,25 @@
+.footer a {
+  color: #dcdcdc;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.footer a:hover {
+  color: #ffffff;
+  padding-left: 4px;
+}
+
+.footer .social-icons a {
+  color: #dcdcdc;
+  font-size: 20px;
+  transition: 0.2s;
+}
+
+.footer .social-icons a:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.footer h5, .footer h4 {
+  letter-spacing: 0.5px;
+}

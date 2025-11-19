@@ -1,0 +1,70 @@
+<%- layout("/layouts/boilerplate") %>
+
+<div class="container py-4">
+    
+  <div class="col-md-8 mx-auto">
+      
+      <div class="card shadow p-4">
+          
+          <h2 class="text-center mb-3">Add New Product</h2>
+
+          <form action="/products" method="POST">
+
+              <!-- TITLE -->
+              <div class="mb-3">
+                  <label class="form-label fw-bold">Product Title</label>
+                  <input type="text" name="title" class="form-control" placeholder="Enter product title" required>
+              </div>
+
+              <!-- PRICE -->
+              <div class="mb-3">
+                  <label class="form-label fw-bold">Price (₹)</label>
+                  <input type="number" name="price" class="form-control" placeholder="Enter price" required>
+              </div>
+
+              <!-- CATEGORY -->
+              <div class="mb-3">
+                  <label class="form-label fw-bold">Category</label>
+                  <select name="category" class="form-select" required>
+                      <option value="">-- Select Category --</option>
+                      <option>Shirts</option>
+                      <option>T-Shirts</option>
+                      <option>Hoodies</option>
+                      <option>Jeans</option>
+                      <option>Trousers</option>
+                      <option>Jackets</option>
+                      <option>Kurtas</option>
+                      <option>Shoes</option>
+                  </select>
+              </div>
+
+              <!-- IMAGE URL -->
+              <div class="mb-3">
+                  <label class="form-label fw-bold">Image URL</label>
+                  <input type="text" name="image" class="form-control" placeholder="Enter image link" required>
+              </div>
+
+              <!-- DESCRIPTION -->
+              <div class="mb-3">
+                  <label class="form-label fw-bold">Description</label>
+                  <textarea name="description" class="form-control" rows="4" placeholder="Write product description here..." required></textarea>
+              </div>
+
+              <!-- STOCK -->
+              <div class="mb-3">
+                  <label class="form-label fw-bold">Stock</label>
+                  <input type="number" name="stock" class="form-control" placeholder="Available stock" required>
+              </div>
+
+              <!-- SUBMIT BUTTON -->
+              <button class="btn btn-dark w-100 py-2">
+                Add Product
+              </button>
+
+          </form>
+
+      </div>
+
+  </div>
+
+</div>
