@@ -31,14 +31,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride("_method"));
 
 // ---------------- MONGODB CONNECTION ----------------
-const dbUrl = process.env.DATABASE_URL;
+const dbUrl = process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/Bhola";
 
 async function main() {
   try {
     await mongoose.connect(dbUrl);
-    console.log(" MongoDB connected");
+    console.log("✅ MongoDB connected");
   } catch (err) {
-    console.error(" MongoDB connection error:", err.message);
+    console.error("❌ MongoDB connection error:", err.message);
   }
 }
 main();
