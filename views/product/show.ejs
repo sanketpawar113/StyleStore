@@ -8,12 +8,12 @@
     <div class="col-md-6">
 
       <!-- Main Product Image -->
-      <img id="mainImage" src="<%= product.image.url %>" class="main-img shadow">
+      <img id="mainImage" src="<%= product.image.url || product.image %>" class="main-img shadow">
 
       <!-- Thumbnails -->
       <div class="row mt-3 g-2">
         <div class="col-3">
-          <img src="<%= product.image.url %>" class="thumb-img" onclick="changeImage(this.src)">
+          <img src="<%= product.image.url || product.image %>" class="thumb-img" onclick="changeImage(this.src)">
         </div>
 
         <div class="col-3">
@@ -38,13 +38,7 @@
       <h2 class="fw-bold"><%= product.title %></h2>
       <p class="text-muted fs-5"><%= product.category %></p>
 
-      <!-- SELLER / OWNER NAME -->
-      <p class="text-muted">
-        Sold by:
-        <strong>
-          <%= product.owner ? product.owner.username : "Unknown Seller" %>
-        </strong>
-      </p>
+      
 
 
       <!-- Ratings -->

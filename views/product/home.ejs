@@ -9,7 +9,7 @@
 
         <!-- Image -->
         <div class="product-img">
-          <img src="<%= product.image.url %>" alt="<%= product.title %>">
+          <img src="<%= product.image.url || product.image %>" alt="<%= product.title %>">
           <span class="product-category"><%= product.category %></span>
         </div>
 

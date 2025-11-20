@@ -31,7 +31,7 @@
         <!-- CURRENT IMAGE -->
         <div class="mb-3">
           <label class="form-label fw-bold">Current Image</label><br>
-          <img src="<%= product.image.url %>" class="img-thumbnail mb-2" style="max-width: 160px;">
+          <img src="<%= product.image.url || product.image %>" class="img-thumbnail mb-2" style="max-width: 160px;">
         </div>
 
         <!-- NEW IMAGE UPLOAD -->

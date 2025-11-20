@@ -11,6 +11,7 @@ const ejsMate = require("ejs-mate");
 const multer = require("multer");
 
 // Cloudinary config
+// Make sure this file exists: /config/cloudinary.js  (or change name if yours is different)
 const { storage } = require("./config/cloudinary");
 const upload = multer({ storage });
 
@@ -29,24 +30,30 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride("_method"));
 
-// MongoDB Connection
+// ---------------- MONGODB CONNECTION ----------------
 const dbUrl = process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/Bhola";
 
 async function main() {
-  await mongoose.connect(dbUrl);
+  try {
+    await mongoose.connect(dbUrl);
+    console.log("✅ MongoDB connected");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err.message);
+  }
 }
-main()
-  .then(() => console.log("successful connected"))
-  .catch((err) => console.log(err));
+main();
 
-// Session config
+// ---------------- SESSION CONFIG ----------------
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "mysupersecretkey",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: dbUrl }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+      httpOnly: true,
+    },
   })
 );
 
@@ -56,31 +63,45 @@ app.use((req, res, next) => {
   next();
 });
 
-// authentication middleware
+// ---------------- AUTH MIDDLEWARES ----------------
 function isLoggedIn(req, res, next) {
   if (!req.session.userId) {
-    return res.status(401).json({ error: "You must login first" });
+    // For browser app, redirect better than JSON
+    return res.redirect("/login");
   }
   next();
 }
 
-// OWNER MIDDLEWARE
 async function isOwner(req, res, next) {
-  const product = await Product.findById(req.params.id);
-  if (!product) return res.status(404).send("Product not found");
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).send("Product not found");
 
-  if (!product.owner.equals(req.session.userId)) {
-    return res.status(403).send("Access denied: Not your product");
+    if (!product.owner || !product.owner.equals(req.session.userId)) {
+      return res.status(403).send("Access denied: Not your product");
+    }
+
+    next();
+  } catch (err) {
+    next(err);
   }
-  next();
 }
 
-// ---------------- PRODUCT ROUTES ----------------
+// ---------------- ROUTES ----------------
 
-// INDEX
-app.get("/products", async (req, res) => {
-  const products = await Product.find();
-  res.render("product/home", { products });
+// root → redirect to products
+app.get("/", (req, res) => {
+  res.redirect("/products");
+});
+
+// PRODUCTS INDEX
+app.get("/products", async (req, res, next) => {
+  try {
+    const products = await Product.find();
+    res.render("product/home", { products });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // NEW FORM
@@ -88,34 +109,50 @@ app.get("/products/new", isLoggedIn, (req, res) => {
   res.render("product/new");
 });
 
-// CREATE PRODUCT (WITH OWNER)
-app.post("/products", isLoggedIn, upload.single("image"), async (req, res) => {
-  const productData = req.body;
+// CREATE PRODUCT (WITH OWNER + CLOUDINARY)
+app.post("/products", isLoggedIn, upload.single("image"), async (req, res, next) => {
+  try {
+    const productData = req.body;
 
-  if (req.file) {
-    productData.image = {
-      url: req.file.path,
-      public_id: req.file.filename,
-    };
+    if (req.file) {
+      productData.image = {
+        url: req.file.path,
+        public_id: req.file.filename,
+      };
+    }
+
+    productData.owner = req.session.userId;
+
+    await Product.create(productData);
+
+    res.redirect("/products");
+  } catch (err) {
+    next(err);
   }
-
-  productData.owner = req.session.userId; // attach owner
-
-  await Product.create(productData);
-
-  res.redirect("/products");
 });
 
 // SHOW PRODUCT
-app.get("/products/:id", async (req, res) => {
+app.get("/products/:id", async (req, res, next) => {
+  try {
     const product = await Product.findById(req.params.id).populate("owner");
+    if (!product) return res.status(404).send("Product not found");
+
     res.render("product/show", { product });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // EDIT FORM (OWNER ONLY)
-app.get("/products/:id/edit", isLoggedIn, isOwner, async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  res.render("product/edit", { product });
+app.get("/products/:id/edit", isLoggedIn, isOwner, async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).send("Product not found");
+
+    res.render("product/edit", { product });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // UPDATE PRODUCT (OWNER ONLY)
@@ -124,26 +161,34 @@ app.put(
   isLoggedIn,
   isOwner,
   upload.single("image"),
-  async (req, res) => {
-    const updateData = req.body;
+  async (req, res, next) => {
+    try {
+      const updateData = req.body;
 
-    if (req.file) {
-      updateData.image = {
-        url: req.file.path,
-        public_id: req.file.filename,
-      };
+      if (req.file) {
+        updateData.image = {
+          url: req.file.path,
+          public_id: req.file.filename,
+        };
+      }
+
+      await Product.findByIdAndUpdate(req.params.id, updateData);
+
+      res.redirect(`/products/${req.params.id}`);
+    } catch (err) {
+      next(err);
     }
-
-    await Product.findByIdAndUpdate(req.params.id, updateData);
-
-    res.redirect(`/products/${req.params.id}`);
   }
 );
 
 // DELETE PRODUCT (OWNER ONLY)
-app.delete("/products/:id", isLoggedIn, isOwner, async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.redirect("/products");
+app.delete("/products/:id", isLoggedIn, isOwner, async (req, res, next) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.redirect("/products");
+  } catch (err) {
+    next(err);
+  }
 });
 
 // ---------------- AUTH ROUTES ----------------
@@ -152,51 +197,75 @@ app.delete("/products/:id", isLoggedIn, isOwner, async (req, res) => {
 app.get("/signup", (req, res) => res.render("auth/signup"));
 
 // Register
-app.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+app.post("/register", async (req, res, next) => {
+  try {
+    const { username, email, password } = req.body;
 
-  const user = new User({ username, email, password });
-  await user.save();
+    const user = new User({ username, email, password });
+    await user.save();
 
-  req.session.userId = user._id;
-  req.session.role = user.role;
+    req.session.userId = user._id;
+    req.session.role = user.role;
 
-  res.redirect("/products");
+    res.redirect("/products");
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Login page
 app.get("/login", (req, res) => res.render("auth/login"));
 
 // Login
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+app.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) return res.json({ error: "User not found" });
+    const user = await User.findOne({ email });
+    if (!user) return res.json({ error: "User not found" });
 
-  const isMatch = await user.matchPassword(password);
-  if (!isMatch) return res.json({ error: "Incorrect password" });
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) return res.json({ error: "Incorrect password" });
 
-  req.session.userId = user._id;
-  req.session.role = user.role;
+    req.session.userId = user._id;
+    req.session.role = user.role;
 
-  res.redirect("/products");
+    res.redirect("/products");
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Logout
 app.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.redirect("/login");
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
 });
 
 // USERS LIST
-app.get("/users", isLoggedIn, async (req, res) => {
-  const users = await User.find();
-  res.render("auth/users", { users });
+app.get("/users", isLoggedIn, async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.render("auth/users", { users });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).send("Page not found");
+});
+
+// GENERAL ERROR HANDLER
+app.use((err, req, res, next) => {
+  console.error("💥 Server Error:", err);
+  res.status(500).send("Internal Server Error");
 });
 
 // PORT
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log("Server running on 8080");
+  console.log("Server running on port " + PORT);
 });
