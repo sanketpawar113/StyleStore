@@ -43,48 +43,74 @@
           </a>
         </li>
 
-        <!-- USER MENU -->
+        <!-- USER MENU SECTION -->
         <% if (!session || !session.userId) { %>
+
+          <!-- If NOT LOGGED IN -->
           <li class="nav-item mx-2">
             <a href="/login" class="nav-link nav-icon">
               <i class="bi bi-person-circle"></i><span>Login</span>
             </a>
           </li>
+
           <li class="nav-item mx-2">
             <a href="/signup" class="nav-link nav-icon">
               <i class="bi bi-person-plus"></i><span>Signup</span>
             </a>
           </li>
+
         <% } else { %>
 
+        <!-- IF LOGGED IN -->
         <li class="nav-item dropdown mx-2">
           <a class="nav-link nav-icon dropdown-toggle" data-bs-toggle="dropdown">
             <i class="bi bi-person-circle"></i><span>Account</span>
           </a>
+
           <ul class="dropdown-menu dropdown-menu-end">
+
             <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Profile</a></li>
             <li><a class="dropdown-item" href="/orders"><i class="bi bi-box-seam"></i> My Orders</a></li>
+
+            <!-- CREATE PRODUCT → VISIBLE FOR ANY LOGGED-IN USER -->
+            <li>
+              <a class="dropdown-item text-primary fw-bold" href="/products/new">
+                <i class="bi bi-plus-circle"></i> Create Product
+              </a>
+            </li>
+
             <li><a class="dropdown-item text-danger" href="/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
 
+            <!-- ADMIN SECTION -->
             <% if (session.role === "admin") { %>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-primary fw-bold" href="/admin/dashboard">
-                <i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+
+              <li>
+                <a class="dropdown-item text-primary fw-bold" href="/admin/dashboard">
+                  <i class="bi bi-speedometer2"></i> Admin Dashboard
+                </a>
+              </li>
+
+              <li>
+                <a class="dropdown-item text-primary fw-bold" href="/users">
+                  <i class="bi bi-people"></i> User List
+                </a>
+              </li>
             <% } %>
+
           </ul>
         </li>
-
         <% } %>
+
       </ul>
 
     </div>
   </div>
 </nav>
 
-<!-- SUB NAV CATEGORY BAR (Myntra Style) -->
+<!-- SUB NAV CATEGORY BAR -->
 <div class="sub-nav shadow-sm">
   <div class="container d-flex justify-content-center sub-cats">
-
     <a href="/products?cat=Men">Men</a>
     <a href="/products?cat=Women">Women</a>
     <a href="/products?cat=Kids">Kids</a>
